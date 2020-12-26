@@ -7,10 +7,10 @@ services:
     ports:
       - "3001:3000"
     restart: always
-    command: npm run start
+    # command: npm run start
     volumes:
-      - ./:/home/node
-    working_dir: /home/node
+      - ./:/usr/src
+    working_dir: /usr/src
 networks:
   app-network:
     driver: bridge

@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
+import { AppContextProvider, INITIAL_DATA } from './context/context-app';
+import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <AppContextProvider value={INITIAL_DATA}  >
+      <App />
+    </AppContextProvider>
   </React.StrictMode>,
+
   document.getElementById('root')
 );
 
