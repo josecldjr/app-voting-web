@@ -15,7 +15,6 @@ export function PrimaryButton(props: Props) {
         children,
         onClick,
         fullWidth,
-        disabled = false,
         isLoading,
 
     } = props
@@ -24,7 +23,7 @@ export function PrimaryButton(props: Props) {
         <Button
             onClick={() => onClick()}
             fullWidth
-            disabled
+            disabled={props.disabled}
         >
             {!isLoading ? children : <LoadingButton />}
         </Button>

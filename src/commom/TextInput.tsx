@@ -9,10 +9,24 @@ export type Props = {
     forceNumberConversion?: boolean
     sensitive?: boolean
     forceCase?: 'lower' | 'upper'
+    fullWidth?: boolean
+    error?: string
+    value?: string
 }
 
 export function TextInput(props: Props) {
-    const { label, name, onChange, forceNumberConversion = false, id = name, sensitive = false, forceCase } = props
+    const {
+        label,
+        name,
+        onChange,
+        forceNumberConversion = false,
+        id = name,
+        sensitive = false,
+        forceCase,
+        fullWidth = false,
+        error,
+        value,
+    } = props
 
     const handleOnChange = (name: string, _value: string | number) => {
         let value = _value
@@ -41,7 +55,10 @@ export function TextInput(props: Props) {
             name={name}
             onChange={event => handleOnChange(event.target.name, event.target.value)}
             type={sensitive ? 'password' : 'text'}
-
+            fullWidth={fullWidth}
+            error={Boolean(error)}
+            helperText={error}
+            value={value}
         />
     </>
 }

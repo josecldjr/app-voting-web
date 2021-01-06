@@ -1,9 +1,10 @@
 import { Box } from '@material-ui/core';
 import React, { useContext } from 'react';
+import { Route, Switch as SwitchRouter } from 'react-router-dom';
 import './App.css';
-import { Home } from './container/Home';
 import { Login } from './container/Login';
 import { AppContext, AppContextData } from './context/context-app';
+
 
 function App() {
 
@@ -13,7 +14,12 @@ function App() {
     <Box className="App">
       {
         isLoggedIn ?
-          <Home /> :
+          <SwitchRouter>
+            <Route path="/votations">
+
+            </Route>
+          </SwitchRouter>
+          :
           <Login />
 
       }
