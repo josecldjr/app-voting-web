@@ -1,15 +1,18 @@
+import { SnackbarProvider } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { AppContextProvider, INITIAL_DATA } from './context/context-app';
+import { AppContextProvider } from './context/context-app';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppContextProvider value={INITIAL_DATA}  >
-      <App />
-    </AppContextProvider>
+    <SnackbarProvider maxSnack={10}>
+      <AppContextProvider >
+        <App />
+      </AppContextProvider>
+    </SnackbarProvider>
   </React.StrictMode>,
 
   document.getElementById('root')

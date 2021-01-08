@@ -35,10 +35,7 @@ export function RequestLoginForm(props: Props) {
     const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
     const handleOnChange = (name: string, value: string | number) => {
-        console.log();
-
         if (typeof value === 'string' && !value.length) {
-            console.log('DELETE HERE');
 
             setData((data: any) => {
                 delete data[name]
@@ -143,7 +140,6 @@ export function RequestLoginForm(props: Props) {
                     </PrimaryButton>
             }
         </Grid>
-        <Alert />
 
 
     </>
