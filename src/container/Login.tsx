@@ -13,6 +13,7 @@ export function Login() {
 
     const [loginData, setLoginData] = useState<DoLoginRequestDTO>({} as any)
     const [showRegistrationModal, setShowregistrationModal] = useState(false)
+
     const [isDoingLogin, setIsDoingLogin] = useState(false)
 
     const onSend = async (data: DoLoginRequestDTO, setIsLoading: (value: boolean) => void) => {
@@ -35,28 +36,29 @@ export function Login() {
             setIsDoingLogin(false)
 
 
-        }, 1500)
+        }, 1000)
     }
 
     const handleLoginError = (message: string) => {
+
         switch (message) {
             case 'USER_NOT_EXIST':
-                enqueueSnackbar('Nome de login não existe', { variant: 'error' })
+                enqueueSnackbar('Nome de login não existe', { variant: 'error', })
                 break;
             case 'THIS_USER_WAS_DECLINED':
-                enqueueSnackbar('Esse usuário teve o registro recusado', { variant: 'error' })
+                enqueueSnackbar('Esse usuário teve o registro recusado', { variant: 'error', })
 
                 break;
             case 'USER_IS_SUSPENDED':
-                enqueueSnackbar('Esse usuário está atualmente suspenso', { variant: 'warning' })
+                enqueueSnackbar('Esse usuário está atualmente suspenso', { variant: 'warning', })
 
                 break;
             case 'USER_AWAITING_APROVAL':
-                enqueueSnackbar('Esse usuário ainda está aguardando a aprovação', { variant: 'info' })
+                enqueueSnackbar('Esse usuário ainda está aguardando a aprovação', { variant: 'info', })
 
                 break;
             case 'WRONG_PASSWORD':
-                enqueueSnackbar('usuário ou senha estão errados', { variant: 'info' })
+                enqueueSnackbar('usuário ou senha estão errados', { variant: 'info', })
 
                 break;
             default:

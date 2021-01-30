@@ -4,7 +4,7 @@ import { Loading } from '../commom/Loading';
 import { PrimaryButton } from '../commom/PrimaryButton';
 import { TextInput } from '../commom/TextInput';
 import { termsOfUseLink } from '../constants/config';
-import { RequestRegisterRequestDTO, RequestRegisterRequestSchema } from '../dto/request-register.dto';
+import { RequestRegisterRequestDTO, RequestRegisterRequestSchema } from '../dto/request-modification.dto';
 import { isEmptyOrNull, mapYupErrors } from '../utils/form.utils';
 import { removeSpeacialChars } from '../utils/string.utils';
 

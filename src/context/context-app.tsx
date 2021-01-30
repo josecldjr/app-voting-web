@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../dto/model/user.model";
 import { authService } from "../services";
 
@@ -46,4 +46,17 @@ export const AppContextProvider = ({ children }) => {
     }} >
         {children}
     </AppContext.Provider>
+}
+
+
+export const useIsLoggedIn = () => {
+    const { isLoggedIn } = useContext<AppContextType>(AppContext)
+
+    return isLoggedIn
+}
+
+export const useUserData = (): [User | null, (value: User | null) => void] => {
+    const { userData, setUserData } = useContext<AppContextType>(AppContext)
+
+    return [userData, setUserData]
 }

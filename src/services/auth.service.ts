@@ -1,15 +1,13 @@
 import { DoLoginRequestDTO, SignJWTResult } from "../dto/login.dto";
 import { User } from "../dto/model/user.model";
-import { RequestRegisterRequestDTO } from "../dto/request-register.dto";
+import { RequestRegisterRequestDTO } from "../dto/request-modification.dto";
 import { HTTPService } from "./http.service";
 
 export class AuthService {
 
-    private tokenStorageKey = 'atj'
     private userDataStorageKey = 'user-data'
 
     constructor(private httpService: HTTPService) { }
-
 
     async requestRegister(data: RequestRegisterRequestDTO) {
         await this.httpService.post(
@@ -24,18 +22,10 @@ export class AuthService {
             { ...loginData }
         )
 
-        this.setAuthToken(data.token)
+        this.httpService.setAuthToken(data.token)
         this.setUserData(data.user)
 
         return data
-    }
-
-    async setAuthToken(token: string): Promise<void> {
-        localStorage.setItem(this.tokenStorageKey, token)
-    }
-
-    async getAuthToken(): Promise<string> {
-        return localStorage.getItem(this.tokenStorageKey)
     }
 
     async setUserData(userData: User): Promise<void> {
@@ -44,5 +34,10 @@ export class AuthService {
 
     async getUserData(): Promise<User | null> {
         return JSON.parse(localStorage.getItem(this.userDataStorageKey)) as any
+    }
+
+    async logout(): Promise<void> {
+        localStorage.removeItem(this.userDataStorageKey)
+        this.httpService.setAuthToken(null)
     }
 }

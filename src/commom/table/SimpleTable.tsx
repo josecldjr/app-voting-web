@@ -1,0 +1,57 @@
+import { Grid } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core'
+import React from 'react'
+
+export type Props = {
+    rows: { [key: string]: any }[]
+    columns: ColumnType[]
+    onRowClicked: (row: { [key: string]: any }) => void
+}
+
+export type ColumnType = {
+    label: string,
+    key: string,
+    render?: (currentRow: { [key: string]: any }, key: string, rows: { [key: string]: any }[]) => {}
+}
+
+export function SimpleTable(props: Props) {
+
+
+    return <TableContainer style={{ overflowX: 'scroll' }}>
+        <Table>
+            <TableHead>
+                <TableRow>
+
+                    {
+                        props.columns.map((col, i) => <TableCell key={i}>
+                            {col.label}
+                        </TableCell>)
+                    }
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {
+                    props.rows.map((row, i) => <TableRow
+                        key={i}
+                        onClick={(row) => props.onRowClicked(row)}
+                        hover
+                    >
+                        {
+                            props.columns.map((col, i) => <TableCell key={i}>
+                                {
+                                    col.render ? <>{col.render(row, col.key, props.rows)}</> : row[col.key]
+                                }
+                            </TableCell>)
+                        }
+                    </TableRow>
+                    )
+                }
+            </TableBody>
+        </Table>
+        <Grid>
+            <Typography >
+                Nada encontrato
+            </Typography>
+        </Grid>
+    </TableContainer >
+}

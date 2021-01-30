@@ -2,7 +2,7 @@ import { Container, makeStyles, Typography } from '@material-ui/core'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { suportEmail } from '../constants/config'
-import { RequestRegisterRequestDTO } from '../dto/request-register.dto'
+import { RequestRegisterRequestDTO } from '../dto/request-modification.dto'
 import { RequestLoginForm } from '../form/RequestLoginForm'
 import { authService } from '../services'
 
@@ -23,6 +23,7 @@ const useStyles = makeStyles(theme => ({
 
     }
 }))
+
 export function RequestLogin() {
     const classes = useStyles()
     const { enqueueSnackbar } = useSnackbar()

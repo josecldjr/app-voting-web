@@ -1,17 +1,26 @@
 import Axios from "axios";
 
 export class HTTPService {
-    private storedTokenkey = 'auth-jwt-value'
 
     private baseURl: string = 'http://localhost:3000'
 
+    private tokenStorageKey = 'atj'
+
     constructor(private authToken: string | null = null) {
+        const token = localStorage.getItem(this.tokenStorageKey)
 
+        this.authToken = token || null
     }
 
-    async setToken(token: string) {
-
+    async setAuthToken(token: string): Promise<void> {
+        localStorage.setItem(this.tokenStorageKey, token)
+        this.authToken = token
     }
+
+    async getAuthToken(): Promise<string> {
+        return localStorage.getItem(this.tokenStorageKey)
+    }
+
 
     getBaseUrl(): string {
         return this.baseURl
