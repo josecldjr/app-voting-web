@@ -1,12 +1,15 @@
-import { Dialog, Grid, makeStyles, Tooltip, Typography, DialogTitle, DialogContent, DialogActions } from '@material-ui/core'
+import { Dialog, DialogActions, DialogContent, DialogTitle, Grid, makeStyles, Tooltip, Typography } from '@material-ui/core'
+import { useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
+import { Dropdown } from '../commom/Dropdown'
+import { PrimaryButton } from '../commom/PrimaryButton'
 import { ColumnType, SimpleTable } from '../commom/table/SimpleTable'
+import { useHasAdminAccess, useHasSuperAdminAccess, } from '../context/context-app'
 import { ListResponseDTO } from '../dto/generic/list.dto'
 import { User } from '../dto/model/user.model'
+import { UserLevelTypes } from '../enum/user-permission-types.enum'
 import { userService } from '../services'
 import { limitString } from '../utils/string.utils'
-import { UserLevelTypes } from '../enum/user-permission-types.enum'
-import { PrimaryButton } from '../commom/PrimaryButton'
 
 const useStyles = makeStyles({
     pendinAprovalText: {
@@ -19,6 +22,10 @@ const useStyles = makeStyles({
 
 export function UserAccessSolicitaions() {
     const classes = useStyles()
+    const { enqueueSnackbar } = useSnackbar()
+    const userIsAdmin = useHasAdminAccess()
+    const userIsSuperAdmin = useHasSuperAdminAccess()
+
 
     const maxNameSize = 25
     const columns: ColumnType[] = [
@@ -31,7 +38,7 @@ export function UserAccessSolicitaions() {
         { key: 'email', label: 'Email', },
         {
             key: 'permissionLevel', label: 'Tipo', render: (row, key) => {
-                return row[key] === UserLevelTypes.awaitingAproval ? renderPendingStateRow(row['id']) : row[key]
+                return renderPendingStateRow(row['id'], row[key], row[key] !== UserLevelTypes.awaitingAproval)
             }
         },
     ]
@@ -44,41 +51,68 @@ export function UserAccessSolicitaions() {
         </Tooltip>
     }
 
-    const renderPendingStateRow = (userId: number) => {
-        return <Grid>
-            <Grid>
-                <Typography className={classes.pendinAprovalText}>
-                    Aguardando
-                </Typography>
-            </Grid>
-            <PrimaryButton
-                variant="contained"
-                onClick={() => {
-                    setSelectedUserId(userId)
+    const renderPendingStateRow = (userId: number, value: number | string, dropDown: boolean) => {
+        console.log(userId, value, dropDown);
+
+        return dropDown
+            ? <Dropdown
+                items={[
+                    { value: UserLevelTypes.admin, label: 'Administrador' },
+                    { value: UserLevelTypes.membership, label: 'Membro' },
+                    { value: UserLevelTypes.suspended, label: 'Suspenso' },
+                    { value: UserLevelTypes.declined, label: 'Negado', disabled: true },
+                    { value: UserLevelTypes.superAdmin, label: 'SuperAdmin', disabled: !userIsSuperAdmin },
+                    { value: UserLevelTypes.visualization, label: 'Observador' },
+
+                ]}
+                value={value}
+                onChange={(value) => {
+                    changeUserSolicitation(userId, value as UserLevelTypes)
                 }}
+                name=""
+                disabled={!userIsAdmin}
 
-            >
-                <Typography>
-                    Responder
-                </Typography>
-            </PrimaryButton>
+            />
+            : <Grid>
+                <Grid>
+                    <Typography className={classes.pendinAprovalText}>
+                        Aguardando
+                    </Typography>
+                </Grid>
+                {
+                    userIsAdmin && <PrimaryButton
+                        variant="contained"
+                        onClick={() => {
+                            setSelectedUserId(userId)
+                        }}
+                    >
+                        <Typography>
+                            Responder
+                        </Typography>
+                    </PrimaryButton>
+                }
 
-        </Grid>
+            </Grid>
     }
+
 
     const fetchUser = async () => {
         const result = await userService.getUsersList()
 
         setUsers(result)
-    }
-
-    const acceptUserSolicitation = (userId: number) => {
 
     }
 
-    const denyUserSolicitation = (userId: number) => {
-
+    const changeUserSolicitation = async (userId: number, access: UserLevelTypes) => {
+        try {
+            await userService.changeUserStatus(userId, { userLevelType: access })
+            setSelectedUserId(0)
+            fetchUser()
+        } catch {
+            enqueueSnackbar('Ops! Ocorreu algum erro! Tente novamente daqui a pouco', { variant: 'error' })
+        }
     }
+
 
     useEffect(() => {
         fetchUser()
@@ -91,14 +125,16 @@ export function UserAccessSolicitaions() {
             </Typography>
         </Grid>
         <Grid>
-            <SimpleTable
-                columns={columns}
-                rows={users && users.list.sort(item => item.permissionLevel === UserLevelTypes.awaitingAproval ? -1 : 1) || []}
-                onRowClicked={() => {
+            {
+                users && <SimpleTable
+                    columns={columns}
+                    rows={users && users.list.sort(item => item.permissionLevel === UserLevelTypes.awaitingAproval ? -1 : 1)}
+                    onRowClicked={() => {
 
-                }}
+                    }}
 
-            />
+                />
+            }
         </Grid>
         <Dialog
             open={Boolean(selectedUserId)}
@@ -114,12 +150,12 @@ export function UserAccessSolicitaions() {
             </DialogContent>
             <DialogActions>
                 <PrimaryButton
-                    onClick={() => acceptUserSolicitation(selectedUserId)}
+                    onClick={() => changeUserSolicitation(selectedUserId, UserLevelTypes.declined)}
                 >
                     Negar
                  </PrimaryButton>
                 <PrimaryButton
-                    onClick={() => denyUserSolicitation(selectedUserId)}
+                    onClick={() => changeUserSolicitation(selectedUserId, UserLevelTypes.membership)}
                 >
                     Aceitar
                  </PrimaryButton>

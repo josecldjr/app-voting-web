@@ -11,6 +11,7 @@ const useStyles = makeStyles({
         right: '1%',
         top: '1%',
         opacity: '.8',
+        zIndex: 100000
     }
 })
 export function SideMenu() {

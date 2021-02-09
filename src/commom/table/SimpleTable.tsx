@@ -17,8 +17,8 @@ export type ColumnType = {
 export function SimpleTable(props: Props) {
 
 
-    return <TableContainer style={{ overflowX: 'scroll' }}>
-        <Table>
+    return <TableContainer style={{ height: 800 }}>
+        <Table stickyHeader >
             <TableHead>
                 <TableRow>
 

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../dto/model/user.model";
+import { UserLevelTypes } from "../enum/user-permission-types.enum";
 import { authService } from "../services";
 
 export type AppContextData = {
@@ -60,3 +61,22 @@ export const useUserData = (): [User | null, (value: User | null) => void] => {
 
     return [userData, setUserData]
 }
+
+export const useUserAccessLevel = () => {
+    const { userData } = useContext<AppContextType>(AppContext)
+
+    return userData.permissionLevel
+}
+
+export const useHasAdminAccess = () => {
+    const { userData } = useContext<AppContextType>(AppContext)
+
+    return userData.permissionLevel === UserLevelTypes.admin || userData.permissionLevel === UserLevelTypes.superAdmin
+}
+
+export const useHasSuperAdminAccess = () => {
+    const { userData } = useContext<AppContextType>(AppContext)
+
+    return userData.permissionLevel === UserLevelTypes.superAdmin
+}
+

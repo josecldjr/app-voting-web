@@ -1,0 +1,27 @@
+Request character
+Login
+List invite request as admin 
+Change user status as Admin
+
+==========
+
+Redefine password
+
+List active votation invites as  users
+Get votation stats as user
+Vote as user
+
+Invite user to votation
+Create votation
+Delete a votation
+get detail from a votation
+
+List system users as admin
+List requests as admins
+
+Accept/deny user modificatiopn as Admin
+Request user modification as User
+
+
+List active votations as  admin
+List inactive votations as admin
