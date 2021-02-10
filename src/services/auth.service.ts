@@ -40,4 +40,15 @@ export class AuthService {
         localStorage.removeItem(this.userDataStorageKey)
         this.httpService.setAuthToken(null)
     }
+
+    async resetPassword(userId: number, newPassword: string): Promise<User> {
+        const { data } = await this.httpService.post<User>(
+            this.httpService.getBaseUrl() + `/auth/redefine-password`, {
+            newPassword,
+            targetUserId: userId,
+
+        })
+
+        return data
+    }
 }

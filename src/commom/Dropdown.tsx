@@ -26,7 +26,8 @@ export function Dropdown(props: Props) {
             fullWidth={fullWidth}
         >
             {
-                items.map(item => <MenuItem
+                items.map((item, index) => <MenuItem
+                    key={index}
                     value={item.value}
                     selected={item.value === value}
                     disabled={item.disabled}

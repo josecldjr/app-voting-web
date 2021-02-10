@@ -25,7 +25,6 @@ export function Login() {
             try {
                 const result = await authService.doLogin(data)
                 setUserData(result.user)
-                console.log(result);
 
             } catch (err) {
                 handleLoginError(err.response.data.message)

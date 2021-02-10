@@ -69,7 +69,6 @@ export function RequestLoginForm(props: Props) {
     useEffect(() => {
         handleErrors()
 
-        console.log(data);
 
     }, [data])
 

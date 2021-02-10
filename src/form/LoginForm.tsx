@@ -27,7 +27,6 @@ export function LoginForm(props: Props) {
     const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
     const handleOnChange = (name: string, value: string | number) => {
-        console.log(name, value);
 
         if (name === 'login') {
             setData({ ...data, [name]: removeSpeacialChars(value.toString()) } as any)

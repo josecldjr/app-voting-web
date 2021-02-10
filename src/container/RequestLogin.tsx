@@ -44,7 +44,6 @@ export function RequestLogin() {
 
             }, 30000)
         } catch (err) {
-            console.log(JSON.stringify(err));
             if (err.response.data.message === 'LOGIN_ALREADY_REGISTERED') {
                 enqueueSnackbar(`
                 Esse login já está em uso. \n

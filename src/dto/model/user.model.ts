@@ -1,6 +1,7 @@
 import { UserLevelTypes } from "../../enum/user-permission-types.enum"
 
 export class User {
+    id: number
     login: string | undefined
 
     name: string | undefined

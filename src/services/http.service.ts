@@ -26,7 +26,7 @@ export class HTTPService {
         return this.baseURl
     }
 
-    get<T>(url: string, params: { [key: string]: string } | string | Object) {
+    get<T>(url: string, params: { [key: string]: any } | string | Object) {
         return Axios.get<T>(url, {
             params,
             headers: {
@@ -35,7 +35,7 @@ export class HTTPService {
         })
     }
 
-    post<T>(url: string, body: { [key: string]: string }, aditionalHeaders: { [key: string]: any } | FormData = {}) {
+    post<T>(url: string, body: { [key: string]: any }, aditionalHeaders: { [key: string]: any } | FormData = {}) {
 
         return Axios.post<T>(url, body, {
             headers: {
@@ -45,7 +45,7 @@ export class HTTPService {
         })
     }
 
-    patch<T>(url: string, body: { [key: string]: string }) {
+    patch<T>(url: string, body: { [key: string]: any }) {
         return Axios.patch<T>(url, body, {
             headers: {
                 'Authorization': 'Bearer ' + this.authToken
@@ -53,7 +53,7 @@ export class HTTPService {
         })
     }
 
-    put<T>(url: string, body: { [key: string]: string },) {
+    put<T>(url: string, body: { [key: string]: any },) {
         return Axios.put<T>(url, body, {
             headers: {
                 'Authorization': 'Bearer ' + this.authToken,

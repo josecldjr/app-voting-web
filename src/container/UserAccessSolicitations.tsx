@@ -1,14 +1,16 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grid, makeStyles, Tooltip, Typography } from '@material-ui/core'
+import { Grid, makeStyles, Tooltip, Typography } from '@material-ui/core'
 import { useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
+import { ConfirmationModal } from '../commom/ConfirmationModal'
 import { Dropdown } from '../commom/Dropdown'
+import { Loading } from '../commom/Loading'
 import { PrimaryButton } from '../commom/PrimaryButton'
 import { ColumnType, SimpleTable } from '../commom/table/SimpleTable'
-import { useHasAdminAccess, useHasSuperAdminAccess, } from '../context/context-app'
+import { useHasAdminAccess, useHasSuperAdminAccess, useUserData } from '../context/context-app'
 import { ListResponseDTO } from '../dto/generic/list.dto'
 import { User } from '../dto/model/user.model'
 import { UserLevelTypes } from '../enum/user-permission-types.enum'
-import { userService } from '../services'
+import { authService, userService } from '../services'
 import { limitString } from '../utils/string.utils'
 
 const useStyles = makeStyles({
@@ -23,8 +25,12 @@ const useStyles = makeStyles({
 export function UserAccessSolicitaions() {
     const classes = useStyles()
     const { enqueueSnackbar } = useSnackbar()
+
     const userIsAdmin = useHasAdminAccess()
     const userIsSuperAdmin = useHasSuperAdminAccess()
+    const [currentUser] = useUserData()
+
+    const [isLoading, setIsLoading] = useState(true)
 
 
     const maxNameSize = 25
@@ -41,9 +47,28 @@ export function UserAccessSolicitaions() {
                 return renderPendingStateRow(row['id'], row[key], row[key] !== UserLevelTypes.awaitingAproval)
             }
         },
+        {
+            key: 'id',
+            label: 'Ação',
+            render: (row, key) => <Grid>
+                <PrimaryButton
+                    onClick={() => setResetPasswordId(row['id'] as number)}
+                    variant="contained"
+                    disabled={
+                        !userIsAdmin ||
+                        row['permissionLevel'] === UserLevelTypes.superAdmin && !userIsSuperAdmin ||
+                        row['id'] === currentUser.id
+
+                    }
+                >
+                    Resetar senha
+                </PrimaryButton>
+            </Grid>
+        }
     ]
     const [users, setUsers] = useState<ListResponseDTO<User> | null>()
     const [selectedUserId, setSelectedUserId] = useState(0)
+    const [resetPasswordId, setResetPasswordId] = useState(0)
 
     const renderNameRow = (name: string) => {
         return <Tooltip title={name}>
@@ -52,7 +77,6 @@ export function UserAccessSolicitaions() {
     }
 
     const renderPendingStateRow = (userId: number, value: number | string, dropDown: boolean) => {
-        console.log(userId, value, dropDown);
 
         return dropDown
             ? <Dropdown
@@ -70,7 +94,7 @@ export function UserAccessSolicitaions() {
                     changeUserSolicitation(userId, value as UserLevelTypes)
                 }}
                 name=""
-                disabled={!userIsAdmin}
+                disabled={!userIsAdmin || userId === currentUser.id || value === UserLevelTypes.superAdmin && !userIsSuperAdmin}
 
             />
             : <Grid>
@@ -97,22 +121,91 @@ export function UserAccessSolicitaions() {
 
 
     const fetchUser = async () => {
-        const result = await userService.getUsersList()
+        setIsLoading(true)
+        try {
+            const result = await userService.getUsersList()
 
-        setUsers(result)
+            setUsers(result)
+        } catch {
+            enqueueSnackbar('Ops! Ocorreu algum erro! Tente novamente daqui a pouco', { variant: 'error' })
+        }
+        setIsLoading(false)
 
     }
 
     const changeUserSolicitation = async (userId: number, access: UserLevelTypes) => {
         try {
+            setIsLoading(true)
             await userService.changeUserStatus(userId, { userLevelType: access })
             setSelectedUserId(0)
             fetchUser()
         } catch {
             enqueueSnackbar('Ops! Ocorreu algum erro! Tente novamente daqui a pouco', { variant: 'error' })
         }
+
+        setIsLoading(false)
     }
 
+    const resetUserPassword = async (userId: number, newPassword: string) => {
+        setIsLoading(true)
+
+        try {
+            await authService.resetPassword(userId, newPassword)
+            enqueueSnackbar('A senha foi redefinida com sucesso. Informe ao usuário.', { variant: 'success' })
+            enqueueSnackbar(`A nova senha do usuário é: ${newPassword}`, { variant: 'default', autoHideDuration: 15000 })
+            setResetPasswordId(0)
+
+        } catch (err) {
+            enqueueSnackbar('Houve um erro ao tentar redefinir a senha! Por favor tente novamente daqui a pouco.', { variant: 'error' })
+
+        }
+
+        setIsLoading(false)
+    }
+
+    const generatePasswordString = (userId: number) => {
+        const user = users.list.filter(user => user.id === userId)[0] || null
+
+        if (!user) {
+            enqueueSnackbar('Houve uma falha ao encontrar os dados do usuário. Tente novamente daqui a pouco', { variant: 'error' })
+            fetchUser()
+
+            setResetPasswordId(0)
+            return
+        }
+
+        const randInt = () => Math.trunc(Math.random() * 10)
+
+        const words1 = [
+            'OVO',
+            'PENTE',
+            'TECLADO',
+            'CARRO',
+            'CASA',
+            'MESA',
+            'IGREJA',
+            'CANETA',
+            'TOMADA',
+            'VIDRO',
+        ]
+
+        const words2 = [
+            'AZUL',
+            'FELIZ',
+            'ESCONDIDO',
+            'VERDE',
+            'VERMELHO',
+            'ROSA',
+            'LILAZ',
+            'DISTANTE',
+            'BRANCO',
+            'PURO',
+        ]
+
+
+
+        return words1[randInt()] + words2[randInt()]
+    }
 
     useEffect(() => {
         fetchUser()
@@ -126,6 +219,9 @@ export function UserAccessSolicitaions() {
         </Grid>
         <Grid>
             {
+                isLoading && <Loading />
+            }
+            {
                 users && <SimpleTable
                     columns={columns}
                     rows={users && users.list.sort(item => item.permissionLevel === UserLevelTypes.awaitingAproval ? -1 : 1)}
@@ -136,30 +232,32 @@ export function UserAccessSolicitaions() {
                 />
             }
         </Grid>
-        <Dialog
+        <ConfirmationModal
+            open={Boolean(resetPasswordId)}
+            onAccept={() => resetUserPassword(resetPasswordId, generatePasswordString(resetPasswordId))}
+            onClose={() => setResetPasswordId(0)}
+            title="Redefinir a senha do usuário?"
+            renderContent={() => <>
+                Deseja redefinir a senha do usuário?
+                <br />
+                <br />
+                <span style={{ color: 'gray' }}>
+                    A nova senha será igual os três primeiros caracteres  + os três últimos.
+                </span>
+
+            </>}
+
+        />
+        <ConfirmationModal
             open={Boolean(selectedUserId)}
             onClose={() => setSelectedUserId(0)}
-        >
-            <DialogTitle>
-                Responder solicitação
-            </DialogTitle>
-            <DialogContent>
+            onAccept={() => changeUserSolicitation(selectedUserId, UserLevelTypes.declined)}
+            onReject={() => changeUserSolicitation(selectedUserId, UserLevelTypes.membership)}
+            title="Responder solicitação"
+            renderContent={() => <>
                 O usuário gostaria de ter acesso ao sistema como membro, <br />
                 Qual a sua resposta?
-
-            </DialogContent>
-            <DialogActions>
-                <PrimaryButton
-                    onClick={() => changeUserSolicitation(selectedUserId, UserLevelTypes.declined)}
-                >
-                    Negar
-                 </PrimaryButton>
-                <PrimaryButton
-                    onClick={() => changeUserSolicitation(selectedUserId, UserLevelTypes.membership)}
-                >
-                    Aceitar
-                 </PrimaryButton>
-            </DialogActions>
-        </Dialog>
+            </>}
+        />
     </Grid>
 }
