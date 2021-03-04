@@ -58,3 +58,13 @@ export function createFileObject(filePath: string, name: string, type: 'image/jp
         type,
     } as any as Blob
 }
+
+export function translateArrayToDict(textArray: string[]) {
+    let dict: { [key: string]: string } = {}
+
+    textArray.forEach((value, index) => {
+        dict[index.toString()] = value
+    })
+
+    return dict
+}

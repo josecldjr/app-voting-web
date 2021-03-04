@@ -1,18 +1,21 @@
 import { Typography } from "@material-ui/core";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import moment from 'moment';
+import React, { useEffect, useState } from "react";
 import { ColumnType, SimpleTable } from "../commom/table/SimpleTable";
 import { ListResponseDTO } from "../dto/generic/list.dto";
 import { Votation } from "../dto/model/votation.model";
 import { votationsService } from "../services";
+import { CreateVotation } from "./CreateVotation";
 
 export function Votations() {
 
+
     const columns: ColumnType[] = [
         { key: 'title', label: 'Nome', render: (row, key) => <Typography variant="overline">{row[key]}</Typography> },
-        { key: 'startTime', label: 'Início', render: (row, key) => new Date(row[key]).toLocaleString() },
+        { key: 'startTime', label: 'Início', render: (row, key) => moment(row[key]).format('DD/MM/YYYY hh:mm') },
+        { key: 'endTIme', label: 'Fim', render: (row, key) => moment(row[key]).format('DD/MM/YYYY hh:mm') },
         { key: 'minVotesCount', label: 'Mínimo de votos', },
-        { key: 'finalized', label: 'Está ativo', render: (row, key) => row[key] ? 'Sim' : 'Não' }
+        { key: 'finalized', label: 'Está ativo', render: (row, key) => row[key] ? 'Não' : 'Sim' },
     ]
 
     const [isLoading, setIsLoading] = useState(false)
@@ -45,8 +48,13 @@ export function Votations() {
 
 
     return <div>
-        Votations
+        <Typography>
+            Votations
+        </Typography>
 
+        <CreateVotation
+            afterCreateVotation={() => fetchVotations()}
+        />
         {
             isLoading ?
                 'Carregando...' :

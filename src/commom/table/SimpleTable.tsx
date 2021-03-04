@@ -1,5 +1,4 @@
-import { Grid } from '@material-ui/core'
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core'
+import { Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core'
 import React from 'react'
 
 export type Props = {
@@ -46,12 +45,15 @@ export function SimpleTable(props: Props) {
                     </TableRow>
                     )
                 }
+                {
+                    !props.rows.length && <Grid>
+                        <Typography >
+                            Nada encontrado
+                        </Typography>
+                    </Grid>
+                }
             </TableBody>
         </Table>
-        <Grid>
-            <Typography >
-                Nada encontrato
-            </Typography>
-        </Grid>
+
     </TableContainer >
 }

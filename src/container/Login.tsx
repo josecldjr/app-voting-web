@@ -27,7 +27,7 @@ export function Login() {
                 setUserData(result.user)
 
             } catch (err) {
-                handleLoginError(err.response.data.message)
+                handleLoginError(err.response?.data?.message)
             }
 
 
@@ -61,7 +61,7 @@ export function Login() {
 
                 break;
             default:
-                enqueueSnackbar('Ops! Algo de errrado não está certo.', { variant: 'info' })
+                enqueueSnackbar('Ops! Algo de errrado não está certo.', { variant: 'error' })
 
                 break;
         }

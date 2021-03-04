@@ -12,6 +12,7 @@ export type Props = {
     fullWidth?: boolean
     error?: string
     value?: string
+    type?: 'date' | 'text' | 'number'
 }
 
 export function TextInput(props: Props) {
@@ -26,6 +27,7 @@ export function TextInput(props: Props) {
         fullWidth = false,
         error,
         value,
+        type = 'text'
     } = props
 
     const handleOnChange = (name: string, _value: string | number) => {
@@ -48,13 +50,23 @@ export function TextInput(props: Props) {
         onChange(name, value)
     }
 
+    const handleType = (type: string, sensitive: boolean) => {
+
+        if (sensitive) {
+            return 'password'
+        } else {
+            return type
+        }
+
+    }
+
     return <>
         <TextField
             id={id}
             label={label}
             name={name}
             onChange={event => handleOnChange(event.target.name, event.target.value)}
-            type={sensitive ? 'password' : 'text'}
+            type={handleType(type, sensitive)}
             fullWidth={fullWidth}
             error={Boolean(error)}
             helperText={error}
